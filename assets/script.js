@@ -40,13 +40,16 @@ function photoAcceuil () {
         gallery.innerHTML = photoHtml
 }
 
-function affichageFiltres(){
+async function affichageFiltres(){
+    let filtrehtml = ' <li class="filtre selected" id="tous" data-index="1">Tous</li>'
     const filtre = document.querySelector(".filtres")
-    filtre.innerHTML = `			
-        <li class="filtre selected" id="tous" data-index="1">Tous</li>
-        <li class="filtre" id="objets" data-index="2">Objets</li>
-        <li class="filtre" id="appartements" data-index="3">Appartements</li>
-        <li class="filtre" id="hotel-restaurants" data-index="4">Hôtels & restaurants</li>`
+    const data = await fetch("http://localhost:5678/api/categories")
+    let filtres = await data.json()
+    for (let i=0; i<filtres.length; i++) {
+        filtrehtml += `<li class="filtre" id="${filtres[i].name}" data-index="${i+2}">${filtres[i].name}</li>`
+    }
+    filtre.innerHTML = filtrehtml
+    detectionFiltre()
 }
 
 function connectionTest() {
@@ -92,35 +95,36 @@ function filtres(filtre) {
         gallery.innerHTML = photoHtml
 }
 
-const filtre = document.querySelectorAll(".filtre")
-console.log(filtre)
-
-for (let i=0; i<filtre.length; i++) {
-    
-    filtre[i].addEventListener("click", ()=> {
-        filtre.forEach(function(item) {
-            item.classList.remove("selected")
-        })
+function detectionFiltre() {
+    const filtre = document.querySelectorAll(".filtre")
+    console.log(filtre)
+    for (let i=0; i<filtre.length; i++) {
         
-        switch(filtre[i].dataset.index) {
-            case "1" : 
-                ajouterTravaux()
-                filtre[0].classList.add("selected")
-                break
-            case "2" :
-                filtres("Objets")
-                filtre[1].classList.add("selected")
-                break
-            case "3" :
-                filtres("Appartements")
-                filtre[2].classList.add("selected")
-                break
-            case "4" :
-                filtres("Hotels & restaurants") 
-                filtre[3].classList.add("selected")           
-                break
-        }
-    })
+        filtre[i].addEventListener("click", ()=> {
+            filtre.forEach(function(item) {
+                item.classList.remove("selected")
+            })
+            
+            switch(filtre[i].dataset.index) {
+                case "1" : 
+                    ajouterTravaux()
+                    filtre[0].classList.add("selected")
+                    break
+                case "2" :
+                    filtres("Objets")
+                    filtre[1].classList.add("selected")
+                    break
+                case "3" :
+                    filtres("Appartements")
+                    filtre[2].classList.add("selected")
+                    break
+                case "4" :
+                    filtres("Hotels & restaurants") 
+                    filtre[3].classList.add("selected")           
+                    break
+            }
+        })
+    }
 }
 
 let modale = document.querySelector(".nomodale")
